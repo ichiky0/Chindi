@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ShopPro - Online Shopping</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="top-nav" id="navbar"></nav>
+  <div class="sub-nav" id="subnav"></div>
+
+  <div class="container">
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+      <div class="hero-inner">
+        <div class="hero-text">
+          <span class="hero-label">New Arrivals</span>
+          <h1 class="hero-title">Latest iPhone 15 Pro<br>Titanium Design</h1>
+          <p class="hero-subtitle">Experience the A17 Pro chip. 48MP camera. Starting at $1,299.</p>
+          <button class="btn btn-secondary btn-lg" onclick="location.href='product.html?id=101'">Buy Now</button>
+        </div>
+        <div class="hero-img">
+          <img src="https://images.unsplash.com/photo-1696446701796-da61225697cc?w=400&h=400&fit=crop" alt="iPhone 15 Pro" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Circles -->
+    <div class="section-card">
+      <div class="section-body">
+        <div class="cat-circles" id="categoryCircles"></div>
+      </div>
+    </div>
+
+    <!-- Deals of the Day -->
+    <div class="deal-strip" id="dealStrip">
+      <h3>&#9889; Deals of the Day</h3>
+      <div class="timer" id="timer">
+        <span class="t-box" id="tH">04</span> :
+        <span class="t-box" id="tM">32</span> :
+        <span class="t-box" id="tS">18</span>
+      </div>
+    </div>
+
+    <!-- Best Sellers -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2>Best Sellers</h2>
+        <a href="search.html?q=" class="view-all">View All &rarr;</a>
+      </div>
+      <div class="section-body">
+        <div class="product-grid" id="bestSellers"></div>
+      </div>
+    </div>
+
+    <!-- Top Electronics -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2>Top Electronics</h2>
+        <a href="category.html?cat=electronics" class="view-all">View All &rarr;</a>
+      </div>
+      <div class="section-body">
+        <div class="product-grid" id="topElectronics"></div>
+      </div>
+    </div>
+
+    <!-- Fashion Picks -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2>Fashion Picks</h2>
+        <a href="category.html?cat=fashion" class="view-all">View All &rarr;</a>
+      </div>
+      <div class="section-body">
+        <div class="product-grid" id="fashionPicks"></div>
+      </div>
+    </div>
+
+    <!-- Home Essentials -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2>Home Essentials</h2>
+        <a href="category.html?cat=home" class="view-all">View All &rarr;</a>
+      </div>
+      <div class="section-body">
+        <div class="product-grid" id="homeEssentials"></div>
+      </div>
+    </div>
+
+    <!-- Trending in Books -->
+    <div class="section-card">
+      <div class="section-header">
+        <h2>Trending in Books</h2>
+        <a href="category.html?cat=books" class="view-all">View All &rarr;</a>
+      </div>
+      <div class="section-body">
+        <div class="product-grid" id="trendingBooks"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer id="footer"></footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    // Render category circles
+    const circles = document.getElementById('categoryCircles');
+    circles.innerHTML = CATEGORIES.map(c => `
+      <a href="category.html?cat=${c.id}" class="cat-circle">
+        <div class="icon-wrap">${c.icon}</div>
+        <span>${c.name}</span>
+      </a>
+    `).join('');
+
+    // Best sellers (top rated)
+    const best = [...PRODUCTS].sort((a,b) => b.rating - a.rating).slice(0, 5);
+    document.getElementById('bestSellers').innerHTML = best.map(renderProductCard).join('');
+
+    // Top Electronics
+    const electronics = PRODUCTS.filter(p => p.category === 'Electronics').slice(0, 5);
+    document.getElementById('topElectronics').innerHTML = electronics.map(renderProductCard).join('');
+
+    // Fashion Picks
+    const fashion = PRODUCTS.filter(p => p.category === 'Fashion').slice(0, 5);
+    document.getElementById('fashionPicks').innerHTML = fashion.map(renderProductCard).join('');
+
+    // Home Essentials
+    const home = PRODUCTS.filter(p => p.category === 'Home').slice(0, 5);
+    document.getElementById('homeEssentials').innerHTML = home.map(renderProductCard).join('');
+
+    // Trending Books
+    const books = PRODUCTS.filter(p => p.category === 'Books').slice(0, 5);
+    document.getElementById('trendingBooks').innerHTML = books.map(renderProductCard).join('');
+
+    // Timer countdown
+    function updateTimer() {
+      const h = document.getElementById('tH'), m = document.getElementById('tM'), s = document.getElementById('tS');
+      if (!h) return;
+      let hh = parseInt(h.textContent), mm = parseInt(m.textContent), ss = parseInt(s.textContent);
+      if (ss > 0) ss--; else { ss = 59; if (mm > 0) mm--; else { mm = 59; if (hh > 0) hh--; else hh = 5; } }
+      h.textContent = String(hh).padStart(2,'0');
+      m.textContent = String(mm).padStart(2,'0');
+      s.textContent = String(ss).padStart(2,'0');
+    }
+    setInterval(updateTimer, 1000);
+  </script>
+</body>
+</html>

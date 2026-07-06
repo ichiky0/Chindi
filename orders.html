@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Orders - ShopPro</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="top-nav" id="navbar"></nav>
+  <div class="sub-nav" id="subnav"></div>
+
+  <div class="container">
+    <div class="page-title">My Orders</div>
+    <div id="ordersContent"></div>
+  </div>
+
+  <footer id="footer"></footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    if (!isLoggedIn()) { requireLogin('orders.html'); }
+
+    const params = new URLSearchParams(window.location.search);
+    const successId = params.get('success');
+
+    function renderOrders() {
+      const orders = getOrders();
+      const container = document.getElementById('ordersContent');
+
+      let html = '';
+      if (successId) {
+        html += `
+          <div class="order-success" style="margin-bottom:24px;">
+            <div class="check-icon">&#10003;</div>
+            <h2>Order Placed Successfully!</h2>
+            <p>Thank you for shopping with us.</p>
+            <div class="order-id">Order ID: ${successId}</div>
+            <button class="btn btn-primary" onclick="location.href='index.html'">Continue Shopping</button>
+          </div>
+        `;
+      }
+
+      if (!orders.length) {
+        html += `
+          <div class="empty-state">
+            <div class="icon">&#128230;</div>
+            <h3>No orders yet!</h3>
+            <p>Start shopping to see your orders here.</p>
+            <button class="btn btn-primary" onclick="location.href='index.html'">Shop Now</button>
+          </div>
+        `;
+        container.innerHTML = html;
+        return;
+      }
+
+      html += orders.map(order => {
+        const itemsHtml = order.items.map(item => {
+          const p = PRODUCTS.find(prod => prod.id === item.productId);
+          if (!p) return '';
+          return `
+            <div class="order-item-mini">
+              <img src="${p.images[0]}" alt="${p.name}" onerror="this.style.display='none'" />
+              <div class="info">
+                <div class="name">${p.name}</div>
+                <div class="qty">Qty: ${item.qty}</div>
+              </div>
+              <div style="text-align:right; flex-shrink:0;">
+                <div style="font-weight:700;">${formatCurrency(p.price * item.qty)}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        return `
+          <div class="order-card">
+            <div class="order-card-header">
+              <div>
+                <div class="oid">Order ID: ${order.id}</div>
+                <div class="odate">Placed on ${formatDate(order.date)}</div>
+              </div>
+              <div class="ostatus">${order.status}</div>
+            </div>
+            <div>${itemsHtml}</div>
+            <div class="order-card-footer">
+              <div class="total">Total: ${formatCurrency(order.total)}</div>
+              <div style="font-size:13px; color:var(--text-3);">${order.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = html;
+    }
+
+    renderOrders();
+  </script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shopping Cart - ShopPro</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="top-nav" id="navbar"></nav>
+  <div class="sub-nav" id="subnav"></div>
+
+  <div class="container">
+    <div class="cart-layout" id="cartLayout">
+      <div class="cart-left" id="cartLeft"></div>
+      <div class="cart-right" id="cartRight"></div>
+    </div>
+  </div>
+
+  <footer id="footer"></footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    function renderCart() {
+      const cart = getCart();
+      const left = document.getElementById('cartLeft');
+      const right = document.getElementById('cartRight');
+
+      if (!cart.length) {
+        document.getElementById('cartLayout').innerHTML = `
+          <div class="empty-state" style="width:100%;">
+            <div class="icon">&#128722;</div>
+            <h3>Your cart is empty!</h3>
+            <p>Add items to your cart from our wide collection.</p>
+            <button class="btn btn-primary" onclick="location.href='index.html'">Shop Now</button>
+          </div>
+        `;
+        return;
+      }
+
+      left.innerHTML = `
+        <div class="cart-card">
+          <div class="cart-card-header">
+            <span>My Cart (${cart.length} item${cart.length>1?'s':''})</span>
+            <span style="font-size:13px; color:var(--text-3);">Deliver to: <strong>Home</strong></span>
+          </div>
+          <div class="cart-card-body">
+            ${cart.map(item => {
+              const p = PRODUCTS.find(prod => prod.id === item.productId);
+              if (!p) return '';
+              const disc = getDiscountPercent(p.mrp, p.price);
+              return `
+                <div class="cart-item">
+                  <div class="item-img"><img src="${p.images[0]}" alt="${p.name}" onerror="this.style.display='none'" /></div>
+                  <div class="item-info">
+                    <div class="item-name">${p.name}</div>
+                    <div class="item-seller">Seller: ShopPro Retail</div>
+                    <div class="item-price">
+                      <span class="price">${formatCurrency(p.price)}</span>
+                      <span class="mrp">${formatCurrency(p.mrp)}</span>
+                      <span class="disc">${disc}% off</span>
+                    </div>
+                    <div class="item-qty">
+                      <div class="qty-control">
+                        <button onclick="updateCart(${item.productId}, ${item.qty-1})">&#8722;</button>
+                        <span>${item.qty}</span>
+                        <button onclick="updateCart(${item.productId}, ${item.qty+1})">&#43;</button>
+                      </div>
+                      <div class="item-actions">
+                        <a href="#" onclick="removeCart(${item.productId}); return false;">Remove</a>
+                        <a href="#" onclick="moveToWishlist(${item.productId}); return false;">Save for Later</a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="item-price" style="text-align:right; flex-shrink:0;">
+                    <div class="price">${formatCurrency(p.price * item.qty)}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+
+      const totals = getCartTotal();
+      right.innerHTML = `
+        <div class="cart-card">
+          <div class="price-details">
+            <h3>Price Details</h3>
+            <div class="price-row"><span>Price (${totals.items} items)</span><span>${formatCurrency(totals.mrpTotal)}</span></div>
+            <div class="price-row"><span>Discount</span><span style="color:var(--green);">-${formatCurrency(totals.savings)}</span></div>
+            <div class="price-row"><span>Delivery Charges</span><span style="color:var(--green);">FREE</span></div>
+            <div class="price-row total"><span>Total Amount</span><span>${formatCurrency(totals.total)}</span></div>
+            <div class="price-row save"><span>You will save ${formatCurrency(totals.savings)} on this order</span></div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-lg btn-block" onclick="goCheckout()" style="margin-top:12px;">Place Order</button>
+      `;
+    }
+
+    function updateCart(id, qty) { updateCartQty(id, qty); renderCart(); }
+    function removeCart(id) { removeFromCart(id); renderCart(); showToast('Item removed from cart'); }
+    function moveToWishlist(id) { removeFromCart(id); toggleWishlist(id); renderCart(); showToast('Saved to wishlist!', 'success'); }
+    function goCheckout() { if (requireLogin('checkout.html')) window.location.href = 'checkout.html'; }
+
+    renderCart();
+  </script>
+</body>
+</html>

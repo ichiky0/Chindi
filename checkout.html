@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Checkout - ShopPro</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="top-nav" id="navbar"></nav>
+  <div class="sub-nav" id="subnav"></div>
+
+  <div class="container">
+    <div class="cart-layout">
+      <div class="cart-left" id="checkoutLeft"></div>
+      <div class="cart-right" id="checkoutRight"></div>
+    </div>
+  </div>
+
+  <footer id="footer"></footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    if (!isLoggedIn()) { requireLogin('checkout.html'); }
+
+    const totals = getCartTotal();
+    if (!totals.count) {
+      document.querySelector('.container').innerHTML = `
+        <div class="empty-state" style="margin-top:40px;">
+          <div class="icon">&#128722;</div>
+          <h3>Your cart is empty!</h3>
+          <p>Add items to checkout.</p>
+          <button class="btn btn-primary" onclick="location.href='index.html'">Shop Now</button>
+        </div>
+      `;
+    }
+
+    const addresses = getAddresses();
+    let selectedAddress = addresses.find(a => a.isDefault)?.id || (addresses[0]?.id || null);
+    let selectedPayment = 'cod';
+
+    function renderCheckout() {
+      const left = document.getElementById('checkoutLeft');
+      left.innerHTML = `
+        <div class="checkout-step">
+          <div class="checkout-step-header"><div class="flex" style="align-items:center;"><span class="num">1</span> Login</div><span style="font-weight:500;">${getCurrentUser()?.name} &bull; ${getCurrentUser()?.email}</span></div>
+        </div>
+
+        <div class="checkout-step">
+          <div class="checkout-step-header"><div class="flex" style="align-items:center;"><span class="num">2</span> Delivery Address</div></div>
+          <div class="checkout-step-body">
+            ${addresses.length ? addresses.map(a => `
+              <div class="address-card ${a.id === selectedAddress ? 'selected' : ''}" onclick="selectAddress(${a.id})">
+                <h4>${a.name}${a.isDefault ? ' <span style="background:var(--gray-2);padding:2px 8px;border-radius:3px;font-size:11px;">Default</span>' : ''}</h4>
+                <p>${a.line1}${a.line2 ? ', ' + a.line2 : ''}<br>${a.city}, ${a.state} - ${a.pin}</p>
+                <div class="phone">Phone: ${a.phone}</div>
+              </div>
+            `).join('') : '<p>No saved addresses. Add one below.</p>'}
+            <div class="mt-3" id="newAddressForm" style="display:none;">
+              <div class="form-row">
+                <div class="form-group"><label>Name</label><input type="text" id="aName" /></div>
+                <div class="form-group"><label>Phone</label><input type="tel" id="aPhone" /></div>
+              </div>
+              <div class="form-group"><label>Address Line 1</label><input type="text" id="aLine1" /></div>
+              <div class="form-group"><label>Address Line 2</label><input type="text" id="aLine2" /></div>
+              <div class="form-row">
+                <div class="form-group"><label>City</label><input type="text" id="aCity" /></div>
+                <div class="form-group"><label>State</label><input type="text" id="aState" /></div>
+                <div class="form-group"><label>PIN Code</label><input type="text" id="aPin" /></div>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="saveNewAddress()">Save Address</button>
+            </div>
+            <button class="btn btn-outline btn-sm mt-3" onclick="document.getElementById('newAddressForm').style.display='block'; this.style.display='none';">+ Add New Address</button>
+          </div>
+        </div>
+
+        <div class="checkout-step">
+          <div class="checkout-step-header"><div class="flex" style="align-items:center;"><span class="num">3</span> Payment</div></div>
+          <div class="checkout-step-body">
+            <div class="payment-option ${selectedPayment==='cod'?'selected':''}" onclick="selectPayment('cod')">
+              <input type="radio" name="pay" ${selectedPayment==='cod'?'checked':''} />
+              <span class="pay-icon">&#128176;</span>
+              <div><strong>Cash on Delivery</strong><br><span style="font-size:12px;color:var(--text-3);">Pay when your order arrives</span></div>
+            </div>
+            <div class="payment-option ${selectedPayment==='card'?'selected':''}" onclick="selectPayment('card')">
+              <input type="radio" name="pay" ${selectedPayment==='card'?'checked':''} />
+              <span class="pay-icon">&#128179;</span>
+              <div><strong>Credit / Debit Card</strong><br><span style="font-size:12px;color:var(--text-3);">Secure card payment</span></div>
+            </div>
+            <div class="payment-option ${selectedPayment==='upi'?'selected':''}" onclick="selectPayment('upi')">
+              <input type="radio" name="pay" ${selectedPayment==='upi'?'checked':''} />
+              <span class="pay-icon">&#128241;</span>
+              <div><strong>UPI</strong><br><span style="font-size:12px;color:var(--text-3);">Google Pay, PhonePe, Paytm</span></div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const right = document.getElementById('checkoutRight');
+      const cart = getCart();
+      right.innerHTML = `
+        <div class="cart-card">
+          <div class="price-details">
+            <h3>Price Details (${totals.items} items)</h3>
+            <div class="price-row"><span>Total MRP</span><span>${formatCurrency(totals.mrpTotal)}</span></div>
+            <div class="price-row"><span>Discount</span><span style="color:var(--green);">-${formatCurrency(totals.savings)}</span></div>
+            <div class="price-row"><span>Delivery</span><span style="color:var(--green);">FREE</span></div>
+            <div class="price-row total"><span>Total</span><span>${formatCurrency(totals.total)}</span></div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-lg btn-block mt-3" onclick="confirmOrder()">Confirm Order</button>
+      `;
+    }
+
+    function selectAddress(id) { selectedAddress = id; renderCheckout(); }
+    function selectPayment(method) { selectedPayment = method; renderCheckout(); }
+
+    function saveNewAddress() {
+      const name = document.getElementById('aName').value.trim();
+      const phone = document.getElementById('aPhone').value.trim();
+      const line1 = document.getElementById('aLine1').value.trim();
+      const line2 = document.getElementById('aLine2').value.trim();
+      const city = document.getElementById('aCity').value.trim();
+      const state = document.getElementById('aState').value.trim();
+      const pin = document.getElementById('aPin').value.trim();
+      if (!name || !phone || !line1 || !city || !state || !pin) { showToast('Please fill all fields', 'error'); return; }
+      const addr = { id: Date.now(), name, phone, line1, line2, city, state, pin, isDefault: false };
+      const all = getAddresses(); all.push(addr); saveAddresses(all); selectedAddress = addr.id;
+      showToast('Address saved', 'success'); renderCheckout();
+    }
+
+    function confirmOrder() {
+      if (!selectedAddress) { showToast('Please select a delivery address', 'error'); return; }
+      const addr = getAddresses().find(a => a.id === selectedAddress);
+      if (!addr) { showToast('Please select a valid address', 'error'); return; }
+      const order = placeOrder(addr, selectedPayment);
+      if (order) {
+        window.location.href = `orders.html?success=${order.id}`;
+      }
+    }
+
+    renderCheckout();
+  </script>
+</body>
+</html>

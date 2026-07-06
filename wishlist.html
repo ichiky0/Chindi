@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My Wishlist - ShopPro</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="top-nav" id="navbar"></nav>
+  <div class="sub-nav" id="subnav"></div>
+
+  <div class="container">
+    <div class="page-title">My Wishlist</div>
+    <div id="wishlistContent"></div>
+  </div>
+
+  <footer id="footer"></footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    function renderWishlist() {
+      const list = getWishlist();
+      const container = document.getElementById('wishlistContent');
+      if (!list.length) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">&#10084;</div>
+            <h3>Your wishlist is empty!</h3>
+            <p>Save items you love to buy them later.</p>
+            <button class="btn btn-primary" onclick="location.href='index.html'">Explore Products</button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="cart-card">
+          <div class="cart-card-body">
+            ${list.map(id => {
+              const p = PRODUCTS.find(prod => prod.id === id);
+              if (!p) return '';
+              const disc = getDiscountPercent(p.mrp, p.price);
+              return `
+                <div class="cart-item">
+                  <div class="item-img"><img src="${p.images[0]}" alt="${p.name}" onerror="this.style.display='none'" /></div>
+                  <div class="item-info">
+                    <div class="item-name">${p.name}</div>
+                    <div class="item-price">
+                      <span class="price">${formatCurrency(p.price)}</span>
+                      <span class="mrp">${formatCurrency(p.mrp)}</span>
+                      <span class="disc">${disc}% off</span>
+                    </div>
+                    <div class="item-actions">
+                      <a href="#" onclick="addToCart(${p.id}); return false;">Add to Cart</a>
+                      <a href="#" onclick="removeWishlist(${p.id}); return false;">Remove</a>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function removeWishlist(id) { toggleWishlist(id); renderWishlist(); showToast('Removed from wishlist'); }
+    renderWishlist();
+  </script>
+</body>
+</html>

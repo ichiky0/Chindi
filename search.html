@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Search - ShopPro</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="top-nav" id="navbar"></nav>
+  <div class="sub-nav" id="subnav"></div>
+
+  <div class="container">
+    <div class="sort-bar">
+      <span class="results" id="resultsCount"></span>
+      <div>
+        <span style="font-size:13px; color:var(--text-3); margin-right:8px;">Sort by:</span>
+        <select id="sortSelect" onchange="doSort()">
+          <option value="relevance">Relevance</option>
+          <option value="price-asc">Price: Low to High</option>
+          <option value="price-desc">Price: High to Low</option>
+          <option value="rating">Rating</option>
+        </select>
+      </div>
+    </div>
+    <div class="product-grid" id="searchGrid"></div>
+  </div>
+
+  <footer id="footer"></footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    const qParams = new URLSearchParams(window.location.search);
+    const query = qParams.get('q') || '';
+    let filtered = [];
+
+    function doSearch() {
+      const q = query.toLowerCase().trim();
+      if (!q || q === 'deals') {
+        if (q === 'deals') {
+          const dealIds = new Set(DEALS.map(d => d.id));
+          filtered = PRODUCTS.filter(p => dealIds.has(p.id));
+        } else {
+          filtered = [...PRODUCTS];
+        }
+      } else {
+        filtered = PRODUCTS.filter(p =>
+          p.name.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q) ||
+          p.subcategory.toLowerCase().includes(q) ||
+          p.brand.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q)
+        );
+      }
+      document.getElementById('resultsCount').textContent = `Showing ${filtered.length} result${filtered.length !== 1 ? 's' : ''}${query ? ' for "' + query + '"' : ''}`;
+      doSort();
+    }
+
+    function doSort() {
+      const sort = document.getElementById('sortSelect').value;
+      let sorted = [...filtered];
+      if (sort === 'price-asc') sorted.sort((a, b) => a.price - b.price);
+      if (sort === 'price-desc') sorted.sort((a, b) => b.price - a.price);
+      if (sort === 'rating') sorted.sort((a, b) => b.rating - a.rating);
+      const grid = document.getElementById('searchGrid');
+      if (!sorted.length) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1;">
+            <div class="icon">&#128269;</div>
+            <h3>No results found</h3>
+            <p>Try different keywords or browse categories.</p>
+            <button class="btn btn-primary" onclick="location.href='index.html'">Go Home</button>
+          </div>
+        `;
+        return;
+      }
+      grid.innerHTML = sorted.map(renderProductCard).join('');
+    }
+
+    doSearch();
+  </script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Product - ShopPro</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <nav class="top-nav" id="navbar"></nav>
+  <div class="sub-nav" id="subnav"></div>
+
+  <div class="container">
+    <div id="productDetail"></div>
+
+    <div class="related-section" id="relatedSection" style="display:none;">
+      <h3>Similar Products</h3>
+      <div class="product-grid" id="relatedGrid"></div>
+    </div>
+  </div>
+
+  <footer id="footer"></footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const pid = parseInt(params.get('id'));
+    const product = PRODUCTS.find(p => p.id === pid);
+
+    if (!product) {
+      document.getElementById('productDetail').innerHTML = `
+        <div class="empty-state">
+          <div class="icon">&#128269;</div>
+          <h3>Product not found</h3>
+          <p>The product you are looking for does not exist.</p>
+          <button class="btn btn-primary" onclick="location.href='index.html'">Go Home</button>
+        </div>
+      `;
+    } else {
+      const discount = getDiscountPercent(product.mrp, product.price);
+      const wishlisted = isInWishlist(product.id);
+      document.getElementById('productDetail').innerHTML = `
+        <div class="pd-wrap">
+          <div class="pd-left">
+            <div class="main-img">
+              <img id="mainImg" src="${product.images[0]}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/400x400/f1f3f6/878787?text=No+Image'" />
+            </div>
+            <div class="thumb-row">
+              ${product.images.map((img, i) => `<img src="${img}" class="${i===0?'active':''}" onclick="swapImg(this,'${img}')" onerror="this.style.display='none'" />`).join('')}
+            </div>
+            <div class="pd-actions">
+              <button class="btn btn-secondary btn-lg" onclick="addToCartAndGo(${product.id})"><span>&#128722;</span> Add to Cart</button>
+              <button class="btn btn-accent btn-lg" onclick="buyNow(${product.id})">Buy Now</button>
+            </div>
+          </div>
+          <div class="pd-right">
+            <div class="breadcrumbs">
+              <a href="index.html">Home</a> &rsaquo; <a href="category.html?cat=${product.category.toLowerCase()}">${product.category}</a> &rsaquo; ${product.name}
+            </div>
+            <h1 class="pd-title">${product.name}</h1>
+            <div class="pd-rating">
+              <span class="stars">${product.rating} <span class="star-icon">&#9733;</span></span>
+              <span class="reviews">${product.reviews.toLocaleString()} ratings & reviews</span>
+            </div>
+            <div class="pd-price">
+              <span class="price">${formatCurrency(product.price)}</span>
+              <span class="mrp">${formatCurrency(product.mrp)}</span>
+              <span class="discount">${discount}% off</span>
+              <span class="tag" style="margin-left:8px; font-size:12px; color:var(--text-3);">Inclusive of all taxes</span>
+            </div>
+            <div class="pd-desc">${product.description}</div>
+            <div class="stock-status ${product.stock > 0 ? 'in' : 'out'}">${product.stock > 0 ? '&#10004; In Stock' : '&#10008; Out of Stock'}</div>
+            <div class="delivery">
+              <h4>Delivery & Services</h4>
+              <p>Free delivery within 3-5 business days. Cash on delivery available. 7-day return policy.</p>
+            </div>
+            <h4 style="font-size:14px; font-weight:700; margin-bottom:10px; text-transform:uppercase; color:var(--text-3);">Specifications</h4>
+            <table class="specs-table">
+              ${Object.entries(product.specs).map(([k,v]) => `<tr><th>${k}</th><td>${v}</td></tr>`).join('')}
+            </table>
+          </div>
+        </div>
+      `;
+
+      // Related products
+      const related = PRODUCTS.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+      if (related.length) {
+        document.getElementById('relatedSection').style.display = 'block';
+        document.getElementById('relatedGrid').innerHTML = related.map(renderProductCard).join('');
+      }
+    }
+
+    function swapImg(thumb, src) {
+      document.getElementById('mainImg').src = src;
+      document.querySelectorAll('.thumb-row img').forEach(i => i.classList.remove('active'));
+      thumb.classList.add('active');
+    }
+
+    function addToCartAndGo(id) {
+      addToCart(id, 1);
+    }
+
+    function buyNow(id) {
+      addToCart(id, 1);
+      window.location.href = 'cart.html';
+    }
+  </script>
+</body>
+</html>
