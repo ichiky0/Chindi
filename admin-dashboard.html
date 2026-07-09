@@ -7,42 +7,64 @@
 
 <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
 
-<div class="container" style="max-width:900px;margin:40px auto;">
+<div class="auth-page">
 
-<h2>Admin Dashboard</h2>
+  <div class="auth-box" style="max-width:700px;">
 
-<input id="name" placeholder="Product Name"><br><br>
+    <div class="auth-box-header">
+      <h1>Admin Dashboard</h1>
+      <p>Add a new product to your store</p>
+    </div>
 
-<input id="price" type="number" placeholder="Price"><br><br>
+    <div class="auth-box-body">
 
-<select id="category">
-<option>Books</option>
-<option>Manga</option>
-<option>Novel</option>
-<option>Comic</option>
-<option>Accessories</option>
-</select>
+      <div class="form-group">
+        <label>Product Name</label>
+        <input id="name" placeholder="Product Name">
+      </div>
 
-<br><br>
+      <div class="form-group">
+        <label>Price</label>
+        <input id="price" type="number" placeholder="Price">
+      </div>
 
-<textarea id="description" placeholder="Description"></textarea>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="category">
+          <option>Books</option>
+          <option>Manga</option>
+          <option>Novel</option>
+          <option>Comic</option>
+          <option>Accessories</option>
+        </select>
+      </div>
 
-<br><br>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="description" placeholder="Description"></textarea>
+      </div>
 
-<input id="stock" type="number" placeholder="Stock">
+      <div class="form-group">
+        <label>Stock</label>
+        <input id="stock" type="number" placeholder="Stock">
+      </div>
 
-<br><br>
+      <div class="form-group">
+        <label>Product Image</label>
+        <input id="image" type="file">
+      </div>
 
-<input id="image" type="file">
+      <button class="btn btn-primary btn-lg" id="saveBtn">
+        Save Product
+      </button>
 
-<br><br>
+      <p id="status"></p>
 
-<button id="saveBtn">Save Product</button>
+    </div>
 
-<p id="status"></p>
+  </div>
 
 </div>
 
