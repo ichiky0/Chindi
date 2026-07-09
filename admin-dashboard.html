@@ -1,11 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Dashboard</title>
+
+<link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
-<h1>Admin Dashboard</h1>
+<div class="container" style="max-width:900px;margin:40px auto;">
+
+<h2>Admin Dashboard</h2>
+
+<input id="name" placeholder="Product Name"><br><br>
+
+<input id="price" type="number" placeholder="Price"><br><br>
+
+<select id="category">
+<option>Books</option>
+<option>Manga</option>
+<option>Novel</option>
+<option>Comic</option>
+<option>Accessories</option>
+</select>
+
+<br><br>
+
+<textarea id="description" placeholder="Description"></textarea>
+
+<br><br>
+
+<input id="stock" type="number" placeholder="Stock">
+
+<br><br>
+
+<input id="image" type="file">
+
+<br><br>
+
+<button id="saveBtn">Save Product</button>
+
+<p id="status"></p>
+
+</div>
+
+<script type="module" src="js/admin.js"></script>
 
 </body>
 </html>
