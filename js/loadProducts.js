@@ -9,6 +9,7 @@ async function loadProducts() {
     const snapshot = await getDocs(collection(db, "products"));
 
     const products = snapshot.docs.map(doc => {
+      console.log(snapshot.docs.map(doc => doc.data()));
 
         const data = doc.data();
 
@@ -29,6 +30,7 @@ async function loadProducts() {
         };
 
     });
+  console.log("Products loaded:", products);
 
     document.getElementById("bestSellers").innerHTML =
         products.map(renderProductCard).join("");
