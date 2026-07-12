@@ -56,7 +56,7 @@ async function loadProducts() {
      // Books
      document.getElementById("trendingBooks").innerHTML =
      products
-        .filter(p => p.category === "Books")
+        .filter(p => true)
         .map(renderProductCard)
         .join("");
 
