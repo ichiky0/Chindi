@@ -40,6 +40,13 @@ async function saveProduct() {
         );
 
         const imageData = await upload.json();
+      
+        console.log("Cloudinary Response:", imageData);
+
+        if (!upload.ok) {
+         throw new Error(JSON.stringify(imageData));
+          
+        }
 
         document.getElementById("status").innerHTML = "Saving product...";
 
@@ -64,6 +71,7 @@ async function saveProduct() {
     catch(err){
 
         console.error(err);
+        alert(err.message);
 
         document.getElementById("status").innerHTML =
             "❌ Error adding product.";
