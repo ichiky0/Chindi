@@ -32,7 +32,34 @@ async function loadProducts() {
 
     document.getElementById("bestSellers").innerHTML =
         products.map(renderProductCard).join("");
+    // Electronics
+    document.getElementById("topElectronics").innerHTML =
+    products
+        .filter(p => p.category === "Electronics")
+        .map(renderProductCard)
+        .join("");
 
-}
+    // Fashion
+    document.getElementById("fashionPicks").innerHTML =
+    products
+        .filter(p => p.category === "Fashion")
+        .map(renderProductCard)
+        .join("");
+
+     // Home
+     document.getElementById("homeEssentials").innerHTML =
+     products
+        .filter(p => p.category === "Home")
+        .map(renderProductCard)
+        .join("");
+
+     // Books
+     document.getElementById("trendingBooks").innerHTML =
+     products
+        .filter(p => p.category === "Books")
+        .map(renderProductCard)
+        .join("");
+
+}  
 
 loadProducts();
