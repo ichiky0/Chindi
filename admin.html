@@ -1,1 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Admin Dashboard | middle2class.shop</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+
+<body>
+
+
+<div class="admin-container">
+
+
+<div class="admin-header">
+
+<div>
+
+<h1 class="admin-title">
+<i class="fa-solid fa-user-shield"></i>
+Admin Dashboard
+</h1>
+
+<p>
+Manage products, categories and orders
+</p>
+
+</div>
+
+
+<button class="btn">
+Logout
+</button>
+
+
+</div>
+
+
+
+
+
+<div class="admin-grid">
+
+
+
+<!-- ADD PRODUCT -->
+
+<div class="admin-card">
+
+
+<h3>
+<i class="fa-solid fa-plus"></i>
+Add Product
+</h3>
+
+
+
+<input 
+type="text"
+id="productName"
+placeholder="Product Name">
+
+
+
+<input 
+type="number"
+id="productPrice"
+placeholder="Price">
+
+
+
+<select id="productCategory">
+
+<option value="">
+Select Category
+</option>
+
+<option value="Books">
+Books
+</option>
+
+<option value="Comics">
+Comics
+</option>
+
+<option value="Accessories">
+Accessories
+</option>
+
+<option value="Clothing">
+Clothing
+</option>
+
+
+</select>
+
+
+
+<input 
+type="text"
+id="productImage"
+placeholder="Image URL">
+
+
+
+<textarea
+id="productDescription"
+placeholder="Description"></textarea>
+
+
+
+<button class="btn" onclick="addProduct()">
+
+Add Product
+
+</button>
+
+
+</div>
+
+
+
+
+
+
+<!-- CATEGORY FILTER -->
+
+<div class="admin-card">
+
+
+<h3>
+<i class="fa-solid fa-filter"></i>
+Filter Products
+</h3>
+
+
+
+<select id="filterCategory"
+onchange="filterProducts()">
+
+
+<option value="all">
+All Products
+</option>
+
+
+<option value="Books">
+Books
+</option>
+
+
+<option value="Comics">
+Comics
+</option>
+
+
+<option value="Accessories">
+Accessories
+</option>
+
+
+<option value="Clothing">
+Clothing
+</option>
+
+
+</select>
+
+
+</div>
+
+
+
+
+
+<!-- ADMIN INFO -->
+
+<div class="admin-card">
+
+
+<h3>
+<i class="fa-solid fa-chart-line"></i>
+Store Status
+</h3>
+
+
+<p>
+Products:
+<span id="productCount">
+0
+</span>
+</p>
+
+
+<p>
+Orders:
+<span>
+0
+</span>
+</p>
+
+
+<p>
+Users:
+<span>
+0
+</span>
+</p>
+
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+<!-- PRODUCT TABLE -->
+
+
+<div class="admin-card mt-30">
+
+
+<h3>
+Products List
+</h3>
+
+
+
+<table>
+
+
+<thead>
+
+<tr>
+
+<th>
+Image
+</th>
+
+<th>
+Name
+</th>
+
+<th>
+Category
+</th>
+
+<th>
+Price
+</th>
+
+<th>
+Action
+</th>
+
+
+</tr>
+
+</thead>
+
+
+
+<tbody id="productTable">
+
+
+<tr>
+
+<td colspan="5"
+class="text-center">
+
+No Products Added
+
+</td>
+
+</tr>
+
+
+</tbody>
+
+
+</table>
+
+
+</div>
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+<script src="js/admin.js"></script>
+
+
+</body>
+
+</html>
