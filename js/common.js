@@ -232,16 +232,16 @@ function getDiscountPercent(mrp, price) {
 }
 
 function formatCurrency(amount) {
-  return '$' + parseFloat(amount).toFixed(2);
+  return '₹' + Number(amount).toLocaleString('en-IN');
 }
-
 function formatDate(iso) {
   return new Date(iso).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
 function renderProductCard(product) {
   const wishlisted = isInWishlist(product.id);
-  const discount = getDiscountPercent(product.mrp, product.price);
+const mrp = product.mrp || product.price;
+const discount = getDiscountPercent(mrp, product.price);
   const deal = DEALS.find(d => d.id === product.id);
   const tag = deal ? `<span class="tag">${deal.tag}</span>` : '';
   return `
@@ -250,7 +250,7 @@ function renderProductCard(product) {
         ${wishlisted ? '&#10084;' : '&#9825;'}
       </button>
       <div class="img-wrap">
-        <img src="${product.images[0]}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x400/f1f3f6/878787?text=${encodeURIComponent(product.name)}'" />
+        <img src="${product.images?.[0] || product.image}" alt="${product.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/400x400/f1f3f6/878787?text=${encodeURIComponent(product.name)}'" />
       </div>
       <div class="info">
         <div class="name">${product.name}</div>
@@ -260,7 +260,7 @@ function renderProductCard(product) {
         </div>
         <div class="price-row">
           <span class="price">${formatCurrency(product.price)}</span>
-          <span class="mrp">${formatCurrency(product.mrp)}</span>
+          <span class="mrp">${formatCurrency(mrp)}</span>
           <span class="discount">${discount}% off</span>
         </div>
         ${tag}
