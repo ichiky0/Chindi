@@ -34,14 +34,10 @@ async function loadProducts() {
    
 console.log(products);
 document.getElementById("trendingBooks").innerHTML =
-products.map(p => `
-<div style="border:1px solid red;padding:10px;margin:10px">
-<h3>${p.name}</h3>
-<img src="${p.images[0]}" width="150">
-<p>${p.category}</p>
-<p>${p.price}</p>
-</div>
-`).join("");
+products
+    .filter(p => p.category === "Books")
+    .map(renderProductCard)
+    .join("");
     // Electronics
     document.getElementById("topElectronics").innerHTML =
     products
