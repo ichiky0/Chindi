@@ -1,81 +1,155 @@
-import { db } from "./firebase.js";
-import {
-  collection,
-  addDoc
-} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+// ===============================
+// middle2class.shop Admin Panel
+// ===============================
 
-const CLOUD_NAME = "e1pknxmd";
-const UPLOAD_PRESET = "chindi_upload";
+let products = JSON.parse(localStorage.getItem("products")) || [];
 
-document.getElementById("saveBtn").addEventListener("click", saveProduct);
+renderProducts();
 
-async function saveProduct() {
+function addProduct() {
 
-    const name = document.getElementById("name").value.trim();
-    const price = Number(document.getElementById("price").value);
-    const category = document.getElementById("category").value;
-    const description = document.getElementById("description").value.trim();
-    const stock = Number(document.getElementById("stock").value);
-    const imageFile = document.getElementById("image").files[0];
+    const name = document.getElementById("productName").value.trim();
+    const price = document.getElementById("productPrice").value.trim();
+    const category = document.getElementById("productCategory").value;
+    const image = document.getElementById("productImage").value.trim();
+    const description = document.getElementById("productDescription").value.trim();
 
-    if (!name || !price || !imageFile) {
+    if (!name || !price || !category || !image) {
         alert("Please fill all required fields.");
         return;
     }
 
-    try {
+    const product = {
 
-        document.getElementById("status").innerHTML = "Uploading image...";
+        id: Date.now(),
 
-        const formData = new FormData();
-        formData.append("file", imageFile);
-        formData.append("upload_preset", UPLOAD_PRESET);
+        name,
 
-        const upload = await fetch(
-            `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-            {
-                method: "POST",
-                body: formData
-            }
-        );
+        price: Number(price),
 
-        const imageData = await upload.json();
-      
-        console.log("Cloudinary Response:", imageData);
+        category,
 
-        if (!upload.ok) {
-         throw new Error(JSON.stringify(imageData));
-          
-        }
+        image,
 
-        document.getElementById("status").innerHTML = "Saving product...";
+        description
 
-        await addDoc(collection(db, "products"), {
+    };
 
-            name,
-            price,
-            category,
-            description,
-            stock,
+    products.push(product);
 
-            image: imageData.secure_url,
+    localStorage.setItem("products", JSON.stringify(products));
 
-            createdAt: new Date()
+    clearForm();
 
-        });
+    renderProducts();
 
-        document.getElementById("status").innerHTML =
-            "✅ Product Added Successfully";
+    alert("Product Added Successfully!");
 
-    }
-    catch(err){
+}
 
-        console.error(err);
-        alert(err.message);
+function renderProducts(list = products) {
 
-        document.getElementById("status").innerHTML =
-            "❌ Error adding product.";
+    const table = document.getElementById("productTable");
+
+    document.getElementById("productCount").textContent = products.length;
+
+    if (list.length === 0) {
+
+        table.innerHTML = `
+        <tr>
+            <td colspan="5" class="text-center">
+                No Products Added
+            </td>
+        </tr>
+        `;
+
+        return;
 
     }
+
+    table.innerHTML = "";
+
+    list.forEach(product => {
+
+        table.innerHTML += `
+
+        <tr>
+
+            <td>
+
+                <img
+                src="${product.image}"
+                width="70"
+                style="border-radius:10px">
+
+            </td>
+
+            <td>${product.name}</td>
+
+            <td>${product.category}</td>
+
+            <td>₹${product.price}</td>
+
+            <td>
+
+                <button
+                onclick="deleteProduct(${product.id})"
+                class="btn">
+
+                Delete
+
+                </button>
+
+            </td>
+
+        </tr>
+
+        `;
+
+    });
+
+}
+
+function deleteProduct(id) {
+
+    if (!confirm("Delete this product?")) return;
+
+    products = products.filter(product => product.id !== id);
+
+    localStorage.setItem("products", JSON.stringify(products));
+
+    renderProducts();
+
+}
+
+function filterProducts() {
+
+    const category = document.getElementById("filterCategory").value;
+
+    if (category === "all") {
+
+        renderProducts();
+
+        return;
+
+    }
+
+    const filtered = products.filter(product => product.category === category);
+
+    renderProducts(filtered);
+
+}
+
+function clearForm() {
+
+    document.getElementById("productName").value = "";
+
+    document.getElementById("productPrice").value = "";
+
+    document.getElementById("productCategory").value = "";
+
+    document.getElementById("productImage").value = "";
+
+    document.getElementById("productDescription").value = "";
 
 }
